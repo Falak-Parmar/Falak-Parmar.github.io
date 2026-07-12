@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-interface Particle {
+interface Wisp {
   x: number;
   y: number;
   vx: number;
@@ -10,7 +10,15 @@ interface Particle {
   alpha: number;
   size: number;
   color: string;
+  colorInner: string;
   decay: number;
+  growth: number;
+  angle: number;
+  rotation: number;
+  rotationSpeed: number;
+  scaleX: number;
+  scaleY: number;
+  type: "stormlight" | "mistborn";
 }
 
 export default function Cursor() {
@@ -40,17 +48,29 @@ export default function Cursor() {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Keep track of particles and mouse position
-    const particles: Particle[] = [];
+    // Keep track of wisps and mouse position
+    const wisps: Wisp[] = [];
     let mouseX = 0;
     let mouseY = 0;
     let lastMouseX = 0;
     let lastMouseY = 0;
     let hasMoved = false;
 
-    // Colors: Cyan/Teal (Stormlight) for normal, Warm Amber/Gold for hover (Lifelight/Investiture)
-    const baseColors = ["#4affbd", "#00d8ff", "#ffffff", "#7ee8fa"];
-    const hoverColors = ["#ffd04a", "#ff9000", "#ffffff", "#ffbe53"];
+    // Stormlight colors: Ethereal radiant light blue & white cores
+    const stormlightColors = [
+      "rgba(100, 220, 255, 0.45)", 
+      "rgba(135, 235, 255, 0.4)", 
+      "rgba(74, 180, 255, 0.35)",
+      "rgba(178, 245, 255, 0.45)"
+    ];
+    
+    // Mistborn colors: Light dark, smoky translucent charcoal/gray mists
+    const mistbornColors = [
+      "rgba(15, 15, 18, 0.35)", 
+      "rgba(30, 32, 40, 0.3)", 
+      "rgba(48, 52, 60, 0.25)",
+      "rgba(70, 75, 85, 0.2)"
+    ];
 
     const moveCursor = (e: MouseEvent) => {
       mouseY = e.clientY;
@@ -73,33 +93,56 @@ export default function Cursor() {
       }
     };
 
-    // Particle factory
-    const spawnParticle = (x: number, y: number, isExplosion = false) => {
-      const colors = isHovered.current ? hoverColors : baseColors;
-      const color = colors[Math.floor(Math.random() * colors.length)];
+    // Wisp factory
+    const spawnWisp = (x: number, y: number, type: "stormlight" | "mistborn", isExplosion = false) => {
+      const isStorm = type === "stormlight";
       
-      const angle = isExplosion ? Math.random() * Math.PI * 2 : Math.random() * Math.PI * 2;
+      const colors = isStorm ? stormlightColors : mistbornColors;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const colorInner = isStorm ? "rgba(255, 255, 255, 0.8)" : "rgba(20, 20, 25, 0.15)";
+      
+      const angle = Math.random() * Math.PI * 2;
       const speed = isExplosion 
-        ? Math.random() * 4 + 1.5 
-        : Math.random() * 0.8 + 0.2;
+        ? Math.random() * 3.5 + 1.0 
+        : Math.random() * 0.4 + 0.1;
 
-      particles.push({
+      // Mouse velocity drag factor
+      const dx = mouseX - lastMouseX;
+      const dy = mouseY - lastMouseY;
+      const mvx = dx * 0.15;
+      const mvy = dy * 0.15;
+
+      const vx = mvx + (isExplosion ? Math.cos(angle) * speed : (Math.random() - 0.5) * 0.5);
+      const vy = mvy + (isExplosion ? Math.sin(angle) * speed : -Math.random() * 1.0 - 0.3); // float upward
+
+      wisps.push({
         x,
         y,
-        vx: isExplosion ? Math.cos(angle) * speed : (Math.random() - 0.5) * 1.0,
-        vy: isExplosion ? Math.sin(angle) * speed : -Math.random() * 1.5 - 0.5, // Float upwards like gas
-        alpha: 1.0,
-        size: isExplosion ? Math.random() * 6 + 3 : Math.random() * 8 + 4,
+        vx,
+        vy,
+        alpha: isStorm ? 1.0 : 0.8,
+        size: isStorm 
+          ? (isHovered.current ? Math.random() * 20 + 20 : Math.random() * 15 + 15) // larger stormlight on hover
+          : Math.random() * 25 + 20, // mistborn wisps are larger, softer clouds
         color,
-        decay: isExplosion ? Math.random() * 0.02 + 0.015 : Math.random() * 0.015 + 0.01,
+        colorInner,
+        decay: isExplosion ? Math.random() * 0.02 + 0.015 : Math.random() * 0.008 + 0.006, // slow decay for smoky drift
+        growth: isStorm ? Math.random() * 0.2 + 0.15 : Math.random() * 0.35 + 0.25, // expand as they float
+        angle: Math.atan2(vy, vx),
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.015,
+        scaleX: Math.random() * 0.8 + 1.8, // stretch for wispy flow
+        scaleY: Math.random() * 0.3 + 0.5,
+        type,
       });
     };
 
-    // Explosion on click
+    // Explosion of mixed stormlight and mist on click
     const handleWindowClick = (e: MouseEvent) => {
-      const count = 25;
+      const count = 30;
       for (let i = 0; i < count; i++) {
-        spawnParticle(e.clientX, e.clientY, true);
+        const type = Math.random() < 0.6 ? "stormlight" : "mistborn";
+        spawnWisp(e.clientX, e.clientY, type, true);
       }
     };
 
@@ -108,46 +151,53 @@ export default function Cursor() {
     const tick = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Spawn particles as mouse moves
       if (hasMoved) {
-        // Calculate distance moved
         const dist = Math.hypot(mouseX - lastMouseX, mouseY - lastMouseY);
-        const spawnCount = isHovered.current ? 4 : 2;
         
-        if (dist > 2) {
+        // Spawn both types of wisps along the path
+        if (dist > 1.5) {
+          const spawnCount = isHovered.current ? 3 : 1;
           for (let i = 0; i < spawnCount; i++) {
-            // Interpolate coordinates for smoother trailing paths
             const ratio = i / spawnCount;
             const x = lastMouseX + (mouseX - lastMouseX) * ratio;
             const y = lastMouseY + (mouseY - lastMouseY) * ratio;
-            spawnParticle(x, y);
+            
+            // Spawn stormlight wisp
+            spawnWisp(x, y, "stormlight");
+            
+            // Spawn mistborn wisp (slightly offset for mixing)
+            if (Math.random() < 0.8) {
+              spawnWisp(x + (Math.random() - 0.5) * 10, y + (Math.random() - 0.5) * 10, "mistborn");
+            }
           }
         }
         
         lastMouseX = mouseX;
         lastMouseY = mouseY;
         hasMoved = false;
-      } else if (Math.random() < 0.15) {
-        // Idle spawn a tiny puff of stormlight occasionally
-        spawnParticle(mouseX, mouseY);
+      } else if (Math.random() < 0.12) {
+        // Ambient idle swirling wisps
+        spawnWisp(mouseX, mouseY, Math.random() < 0.5 ? "stormlight" : "mistborn");
       }
 
-      // Update and draw particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
+      // Update and draw wisps
+      for (let i = wisps.length - 1; i >= 0; i--) {
+        const p = wisps[i];
         p.x += p.vx;
         p.y += p.vy;
         
-        // Ethereal rising stormlight physics (upward drift + wave sway)
-        p.vy -= 0.02; // soft gravity/rise helper
-        p.vx += Math.sin(p.y * 0.05) * 0.02; // wavy movement
+        // Ethereal swirling turbulence physics
+        p.vy -= 0.012; // slow upward drift
+        p.vx += Math.sin(p.y * 0.02 + p.rotation) * 0.06; // sway/turbulence
         p.vx *= 0.98;
         p.vy *= 0.98;
         
+        p.size += p.growth;
+        p.rotation += p.rotationSpeed;
         p.alpha -= p.decay;
 
         if (p.alpha <= 0) {
-          particles.splice(i, 1);
+          wisps.splice(i, 1);
           continue;
         }
 
@@ -155,15 +205,20 @@ export default function Cursor() {
         ctx.globalAlpha = p.alpha;
         ctx.beginPath();
         
-        // Glowing radial gradient circle
-        const radius = Math.max(0.1, p.size * p.alpha);
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
-        grad.addColorStop(0, p.color);
-        grad.addColorStop(0.3, p.color);
-        grad.addColorStop(1, "rgba(74, 255, 189, 0)");
+        // Translate, rotate, and scale to create the stretched wispy shape
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.scale(p.scaleX, p.scaleY);
+        
+        const radius = Math.max(0.1, p.size);
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+        
+        grad.addColorStop(0, p.colorInner);
+        grad.addColorStop(0.25, p.color);
+        grad.addColorStop(1, "rgba(0, 0, 0, 0)");
         
         ctx.fillStyle = grad;
-        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       }
