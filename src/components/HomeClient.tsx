@@ -6,9 +6,7 @@ import SocialsChips from "@/components/SocialsChips";
 import { GitHubCalendar } from "react-github-calendar";
 import GitHubChips from "@/components/GitHubChips";
 
-import "@/styles/index/photos-switcher.css";
 import "@/styles/index/highlights.css";
-import "@/styles/index/form.css";
 import "@/styles/index/github-stats.css";
 
 interface Activity {
