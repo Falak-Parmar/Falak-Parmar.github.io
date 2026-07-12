@@ -1,73 +1,112 @@
-body{
-    cursor:none
+body {
+  cursor: none !important;
+}
+
+/* Hide standard cursor globally */
+a, button, select, input, textarea, [role="button"], iframe {
+  cursor: none !important;
+}
+
+.cursor-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.rounded {
+  position: fixed;
+  top: -24px;
+  left: -24px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.2s ease;
+
+  @media screen and (max-width: 500px) {
+    display: none !important;
   }
+}
+
+/* Outer ring representing a Cosmere Aon / glyph vortex */
+.cursor-ring {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--primary-color);
+  opacity: 0.6;
+  box-shadow: 0 0 8px rgba(74, 255, 189, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+/* Inner core bead of light (Stormlight) */
+.cursor-core {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+/* Hover flaring / spin interaction */
+.cursor-grow .cursor-ring {
+  width: 38px;
+  height: 38px;
+  opacity: 0.95;
+  border: 1.5px dashed var(--primary-color);
+  box-shadow: 0 0 12px var(--primary-color);
+  animation: spin-glyph 12s linear infinite;
+}
+
+.cursor-grow .cursor-core {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 0 15px #ffffff, 0 0 25px var(--primary-color);
+}
+
+@keyframes spin-glyph {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#cursor-text {
+  position: fixed;
+  text-align: left;
+  text-wrap: nowrap;
+  background-color: var(--primary-color);
+  color: var(--background-color-primary);
+  padding: 1em;
+  border-radius: 1em;
+  z-index: 10000;
+  pointer-events: none;
+  scale: 0;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 20px 0 var(--background-color-primary);
   
-  .rounded{
-      /* https://codepen.io/developeraspire5/pen/gOGjeZG */
-      position: fixed;
-      top: -25px;
-      left: -25px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50% !important;
-      background-color: var(--background-color-tr);
-      z-index: 10000;
-      pointer-events: none;
-      transition: outline 0.5s ease-in-out;
-
-      @media screen and (max-width: 500px){
-        display: none !important;
-      }
+  &.image-view {
+    width: 750px;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    object-fit: cover;
   }
-
-  a:hover{
-    cursor: none;
-  }
-
-  .blur{
-    backdrop-filter: blur(5px);
-    transition: backdrop-filter 0.5s ease-in-out;
-  }
-
-  .cursor-normal{
-    outline:2px dashed var(--primary-color);
-    transition: border 0.5s ease-in-out;
-  }
-
-  .cursor-grow{
-    /* border: 5px solid var(--primary-color); */
-    outline: 3px solid var(--primary-color);
-    transition: border 0.5s ease-in-out;
-  }
-
-  .blur-mini{
-    backdrop-filter: blur(0px);
-    transition: backdrop-filter 0.5s ease-in-out;
-  }
-
-  #cursor-text{
-    position: fixed;
-    text-align: left;
-    text-wrap:nowrap;
-    background-color: var(--primary-color);
-    color: var(--background-color-primary);
-    padding: 1em;
-    border-radius: 1em;
-    z-index: 10000;
-    pointer-events: none;
-    scale: 0;
-    transition: all 0.5s ease-in-out;
-    box-shadow: 0 0 20px 0 var(--background-color-primary);
-    &.image-view{
-      width: 750px;
-      height: 400px;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      object-fit: cover;
-    }
-  }
-
-  /* Paste 
-            <div class="cursor rounded move" id="cursor"></div>
-    in your html under body (preferably in container) */
+}
