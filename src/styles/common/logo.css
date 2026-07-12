@@ -41,7 +41,7 @@
       background-image: url("/assets/img/articles/macos/article-icon-macos.png");
     }
     &.home-logo {
-      background-image: url("/assets/img/notion.png");
+      background-image: url("../../../public/assets/img/notion.png");
     }
     &.pixel-logo {
       background-image: url("/assets/img/articles/pixel/article-icon-pixel.png");

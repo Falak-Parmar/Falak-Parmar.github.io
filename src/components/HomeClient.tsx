@@ -22,6 +22,8 @@ interface HomeClientProps {
   wallpaperData?: any;
 }
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export default function HomeClient({
   updatesSection,
   wallpaperData,
@@ -33,7 +35,7 @@ export default function HomeClient({
   const [tick, setTick] = useState(0);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  const [bgUrl, setBgUrl] = useState("/assets/img/clouds.png");
+  const [bgUrl, setBgUrl] = useState(`${basePath}/assets/img/clouds.png`);
   const [bgLoaded, setBgLoaded] = useState(false);
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [projectDetails, setProjectDetails] = useState<Record<string, { stars: number; downloads: number; latestReleaseAt: string }> | null>(null);
@@ -134,9 +136,9 @@ export default function HomeClient({
   };
 
   useEffect(() => {
-    setBgUrl("/assets/img/clouds.png");
+    setBgUrl(`${basePath}/assets/img/clouds.png`);
     const img = new Image();
-    img.src = "/assets/img/clouds.png";
+    img.src = `${basePath}/assets/img/clouds.png`;
     img.onload = () => {
       setBgLoaded(true);
     };
@@ -537,7 +539,7 @@ export default function HomeClient({
                 <span>Mail</span>
               </a>
               <a
-                href="/assets/falak_parmar.pdf"
+                href={`${basePath}/assets/falak_parmar.pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="socials-chip"
