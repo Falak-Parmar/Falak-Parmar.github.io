@@ -28,7 +28,7 @@ a, button, select, input, textarea, [role="button"], iframe {
   justify-content: center;
   z-index: 10000;
   pointer-events: none;
-  mix-blend-mode: screen;
+  mix-blend-mode: difference; /* Highly visible on both light and dark backgrounds */
   transition: opacity 0.2s ease;
 
   @media screen and (max-width: 500px) {
@@ -36,55 +36,39 @@ a, button, select, input, textarea, [role="button"], iframe {
   }
 }
 
-/* Outer ring representing a Cosmere Aon / glyph vortex */
+/* Clean, minimal outer ring */
 .cursor-ring {
   position: absolute;
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  border: 1.5px solid #64dcff; /* Glowing Stormlight Light-Blue */
-  opacity: 0.6;
-  box-shadow: 0 0 8px rgba(100, 220, 255, 0.3);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
-/* Inner core bead of light (Stormlight) */
+/* Clean, minimal inner core dot */
 .cursor-core {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background-color: #a4ebff;
-  box-shadow: 0 0 10px #64dcff, 0 0 20px #64dcff;
+  background-color: rgba(255, 255, 255, 0.9);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
-/* Hover flaring / spin interaction */
+/* Minimal hover scaling */
 .cursor-grow .cursor-ring {
-  width: 38px;
-  height: 38px;
-  opacity: 0.95;
-  border: 1.5px dashed #64dcff;
-  box-shadow: 0 0 15px #64dcff;
-  animation: spin-glyph 12s linear infinite;
+  width: 32px;
+  height: 32px;
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .cursor-grow .cursor-core {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background-color: #ffffff;
-  box-shadow: 0 0 15px #ffffff, 0 0 25px #64dcff;
-}
-
-@keyframes spin-glyph {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 #cursor-text {

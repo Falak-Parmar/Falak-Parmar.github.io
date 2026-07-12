@@ -9,16 +9,13 @@ interface Wisp {
   vy: number;
   alpha: number;
   size: number;
-  color: string;
-  colorInner: string;
+  colorRGB: { r: number; g: number; b: number };
   decay: number;
   growth: number;
-  angle: number;
   rotation: number;
   rotationSpeed: number;
   scaleX: number;
   scaleY: number;
-  type: "stormlight" | "mistborn";
 }
 
 export default function Cursor() {
@@ -56,25 +53,17 @@ export default function Cursor() {
     let lastMouseY = 0;
     let hasMoved = false;
 
-    // Stormlight colors: Ethereal radiant light blue & white cores
-    const stormlightColors = [
-      "rgba(100, 220, 255, 0.45)", 
-      "rgba(135, 235, 255, 0.4)", 
-      "rgba(74, 180, 255, 0.35)",
-      "rgba(178, 245, 255, 0.45)"
-    ];
-    
-    // Mistborn colors: Light dark, smoky translucent charcoal/gray mists
-    const mistbornColors = [
-      "rgba(15, 15, 18, 0.35)", 
-      "rgba(30, 32, 40, 0.3)", 
-      "rgba(48, 52, 60, 0.25)",
-      "rgba(70, 75, 85, 0.2)"
+    // Mistborn mist colors: Translucent charcoal, dark gray, and smoky shadow tones
+    const mistColors = [
+      { r: 25, g: 25, b: 30 },
+      { r: 40, g: 42, b: 50 },
+      { r: 18, g: 18, b: 22 },
+      { r: 55, g: 58, b: 65 }
     ];
 
     const moveCursor = (e: MouseEvent) => {
-      mouseY = e.clientY;
       mouseX = e.clientX;
+      mouseY = e.clientY;
       hasMoved = true;
 
       cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
@@ -94,55 +83,48 @@ export default function Cursor() {
     };
 
     // Wisp factory
-    const spawnWisp = (x: number, y: number, type: "stormlight" | "mistborn", isExplosion = false) => {
-      const isStorm = type === "stormlight";
-      
-      const colors = isStorm ? stormlightColors : mistbornColors;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const colorInner = isStorm ? "rgba(255, 255, 255, 0.8)" : "rgba(20, 20, 25, 0.15)";
+    const spawnWisp = (x: number, y: number, isExplosion = false) => {
+      const colorRGB = mistColors[Math.floor(Math.random() * mistColors.length)];
       
       const angle = Math.random() * Math.PI * 2;
       const speed = isExplosion 
-        ? Math.random() * 3.5 + 1.0 
-        : Math.random() * 0.4 + 0.1;
+        ? Math.random() * 2.0 + 0.5 
+        : Math.random() * 0.2 + 0.05;
 
-      // Mouse velocity drag factor
+      // Subtle mouse velocity drag
       const dx = mouseX - lastMouseX;
       const dy = mouseY - lastMouseY;
-      const mvx = dx * 0.15;
-      const mvy = dy * 0.15;
+      const mvx = dx * 0.05;
+      const mvy = dy * 0.05;
 
-      const vx = mvx + (isExplosion ? Math.cos(angle) * speed : (Math.random() - 0.5) * 0.5);
-      const vy = mvy + (isExplosion ? Math.sin(angle) * speed : -Math.random() * 1.0 - 0.3); // float upward
+      // Very low velocities so mists "hang" in place
+      const vx = mvx + (isExplosion ? Math.cos(angle) * speed : (Math.random() - 0.5) * 0.2);
+      const vy = mvy + (isExplosion ? Math.sin(angle) * speed : -Math.random() * 0.1 - 0.05); // extremely slow upward drift
 
       wisps.push({
         x,
         y,
         vx,
         vy,
-        alpha: isStorm ? 1.0 : 0.8,
-        size: isStorm 
-          ? (isHovered.current ? Math.random() * 20 + 20 : Math.random() * 15 + 15) // larger stormlight on hover
-          : Math.random() * 25 + 20, // mistborn wisps are larger, softer clouds
-        color,
-        colorInner,
-        decay: isExplosion ? Math.random() * 0.02 + 0.015 : Math.random() * 0.008 + 0.006, // slow decay for smoky drift
-        growth: isStorm ? Math.random() * 0.2 + 0.15 : Math.random() * 0.35 + 0.25, // expand as they float
-        angle: Math.atan2(vy, vx),
+        alpha: 0.8,
+        size: isExplosion ? Math.random() * 15 + 10 : Math.random() * 12 + 12, // initial puff size
+        colorRGB,
+        // Slower decay so they hang on screen for ~3 to 5 seconds
+        decay: isExplosion ? Math.random() * 0.015 + 0.01 : Math.random() * 0.0025 + 0.0025,
+        // Steady expansion to represent diffusion
+        growth: Math.random() * 0.15 + 0.12, 
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.015,
-        scaleX: Math.random() * 0.8 + 1.8, // stretch for wispy flow
-        scaleY: Math.random() * 0.3 + 0.5,
-        type,
+        rotationSpeed: (Math.random() - 0.5) * 0.006, // slow spin
+        scaleX: Math.random() * 0.6 + 1.5, // wispy elongated proportions
+        scaleY: Math.random() * 0.3 + 0.6,
       });
     };
 
-    // Explosion of mixed stormlight and mist on click
+    // Burst of mists on click
     const handleWindowClick = (e: MouseEvent) => {
-      const count = 30;
+      const count = 20;
       for (let i = 0; i < count; i++) {
-        const type = Math.random() < 0.6 ? "stormlight" : "mistborn";
-        spawnWisp(e.clientX, e.clientY, type, true);
+        spawnWisp(e.clientX, e.clientY, true);
       }
     };
 
@@ -154,30 +136,24 @@ export default function Cursor() {
       if (hasMoved) {
         const dist = Math.hypot(mouseX - lastMouseX, mouseY - lastMouseY);
         
-        // Spawn both types of wisps along the path
-        if (dist > 1.5) {
-          const spawnCount = isHovered.current ? 3 : 1;
-          for (let i = 0; i < spawnCount; i++) {
-            const ratio = i / spawnCount;
+        // Spawn mists at intervals along the path to keep trails smooth and unified
+        const stepSize = 12;
+        if (dist > stepSize) {
+          const steps = Math.floor(dist / stepSize);
+          for (let i = 0; i < steps; i++) {
+            const ratio = (i + 1) / steps;
             const x = lastMouseX + (mouseX - lastMouseX) * ratio;
             const y = lastMouseY + (mouseY - lastMouseY) * ratio;
             
-            // Spawn stormlight wisp
-            spawnWisp(x, y, "stormlight");
-            
-            // Spawn mistborn wisp (slightly offset for mixing)
-            if (Math.random() < 0.8) {
-              spawnWisp(x + (Math.random() - 0.5) * 10, y + (Math.random() - 0.5) * 10, "mistborn");
-            }
+            spawnWisp(x, y);
           }
+          lastMouseX = mouseX;
+          lastMouseY = mouseY;
+          hasMoved = false;
         }
-        
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        hasMoved = false;
-      } else if (Math.random() < 0.12) {
-        // Ambient idle swirling wisps
-        spawnWisp(mouseX, mouseY, Math.random() < 0.5 ? "stormlight" : "mistborn");
+      } else if (Math.random() < 0.05) {
+        // Idle slow puff
+        spawnWisp(mouseX, mouseY);
       }
 
       // Update and draw wisps
@@ -186,9 +162,9 @@ export default function Cursor() {
         p.x += p.vx;
         p.y += p.vy;
         
-        // Ethereal swirling turbulence physics
-        p.vy -= 0.012; // slow upward drift
-        p.vx += Math.sin(p.y * 0.02 + p.rotation) * 0.06; // sway/turbulence
+        // Minimal drift & gentle waving turbulence
+        p.vy -= 0.004; // very slight upward float
+        p.vx += Math.sin(p.y * 0.015 + p.rotation) * 0.02; // slow sway
         p.vx *= 0.98;
         p.vy *= 0.98;
         
@@ -213,8 +189,11 @@ export default function Cursor() {
         const radius = Math.max(0.1, p.size);
         const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
         
-        grad.addColorStop(0, p.colorInner);
-        grad.addColorStop(0.25, p.color);
+        const c = p.colorRGB;
+        // Super soft, misty opacity transitions
+        grad.addColorStop(0, `rgba(${c.r}, ${c.g}, ${c.b}, 0.22)`);
+        grad.addColorStop(0.3, `rgba(${c.r}, ${c.g}, ${c.b}, 0.12)`);
+        grad.addColorStop(0.7, `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`);
         grad.addColorStop(1, "rgba(0, 0, 0, 0)");
         
         ctx.fillStyle = grad;
