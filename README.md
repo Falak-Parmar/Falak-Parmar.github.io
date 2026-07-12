@@ -1,22 +1,24 @@
-# sameerasw.com
-My portfolio website source code
+# Falak Parmar Portfolio
 
-<img width="1280" height="720" alt="CleanShot-Helium-Sameera Wijerathna-20260709-9  20 35@2x Large" src="https://github.com/user-attachments/assets/44339a5e-5e0c-44c6-baf8-f884b9014f60" />
+My premium personal developer portfolio website, built with Next.js and styled using cohesive Bento Grid layouts.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 🛠️ Tech Stack
+* **Framework**: Next.js (App Router, React)
+* **Styling**: Tailwind CSS & Vanilla CSS
+* **Build Target**: Static HTML Export (`output: 'export'`)
+* **Deployment**: GitHub Pages via GitHub Actions CI/CD
 
-## Getting Started
+## 🚀 Getting Started
 
-First, run the development server:
+First, install dependencies and run the development server locally:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 📦 Deployment
+
+The project is automatically built and deployed to GitHub Pages whenever changes are pushed to the `main` branch.
