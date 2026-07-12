@@ -25,13 +25,13 @@ export default function Cursor() {
       if (mouseX > window.innerWidth - cursorText.clientWidth) {
         cursorText.style.left = -cursorText.clientWidth + "px";
       } else {
-        cursorText.style.left = "40px";
+        cursorText.style.left = "45px";
       }
 
       if (mouseY > window.innerHeight - cursorText.clientHeight) {
         cursorText.style.top = -cursorText.clientHeight + "px";
       } else {
-        cursorText.style.top = "40px";
+        cursorText.style.top = "45px";
       }
     };
 
@@ -154,18 +154,23 @@ export default function Cursor() {
         <svg viewBox="0 0 40 40" width="100%" height="100%">
           {/* Outer spin ring */}
           <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" strokeWidth="1.2" />
-          {/* Inner dashed ring */}
-          <circle cx="20" cy="20" r="10" fill="none" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2, 2" opacity="0.6" />
-          {/* Center vertical axis line */}
-          <line x1="20" y1="2" x2="20" y2="38" stroke="currentColor" strokeWidth="0.8" opacity="0.8" />
-          {/* Horizontal central lens/curves */}
-          <path d="M 6,20 Q 20,12 34,20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.8" />
-          <path d="M 6,20 Q 20,28 34,20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.8" />
-          {/* Aon Rao crescent wings */}
-          <path d="M 10,10 Q 20,16 30,10" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.8" />
-          <path d="M 10,30 Q 20,24 30,30" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.8" />
+          {/* Inner ring */}
+          <circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
           {/* Central core dot */}
-          <circle cx="20" cy="20" r="2.2" fill="currentColor" />
+          <circle cx="20" cy="20" r="3" fill="currentColor" />
+          
+          {/* Symmetrical rays representing Light / Hope / Star (Ashe) */}
+          {/* Vertical and Horizontal rays */}
+          <line x1="20" y1="2" x2="20" y2="12" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="20" y1="28" x2="20" y2="38" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="2" y1="20" x2="12" y2="20" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="28" y1="20" x2="38" y2="20" stroke="currentColor" strokeWidth="1.2" />
+          
+          {/* Diagonal rays */}
+          <line x1="7.3" y1="7.3" x2="14.3" y2="14.3" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="25.7" y1="25.7" x2="32.7" y2="32.7" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="32.7" y1="7.3" x2="25.7" y2="14.3" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="14.3" y1="25.7" x2="7.3" y2="32.7" stroke="currentColor" strokeWidth="1.2" />
         </svg>
       </div>
       <div id="cursor-text" ref={cursorTextRef}></div>
