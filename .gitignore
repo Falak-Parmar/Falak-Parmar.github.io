@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+*/.DS_Store
+*.DS_Store
+node_modules=
+*node_modules
+
+# Local Netlify folder
+.netlify

@@ -1,0 +1,113 @@
+/* ── chip row ──────────────────────────────────────────── */
+.github-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-color);
+  padding: 12px 20px 8px;
+  max-width: 90vw;
+  width: fit-content;
+  box-sizing: border-box;
+}
+
+/* ── base chip ─────────────────────────────────────────── */
+.gh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 5px 5px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--background-color-tr);
+  backdrop-filter: blur(var(--blur));
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.22s ease, background 0.22s ease, padding 0.22s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gh-chip:hover {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 10%, var(--background-color-tr));
+}
+
+/* ── icon ──────────────────────────────────────────────── */
+.gh-chip-icon {
+  font-size: 15px !important;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+/* ── value + label: shown/hidden on hover ──────────────── */
+.gh-chip-value {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.gh-chip-label {
+  font-size: 11px;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity 0.22s ease, max-width 0.22s ease, margin-left 0.22s ease;
+  color: var(--primary-color);
+  margin-left: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gh-chip:hover .gh-chip-label {
+  opacity: 0.75;
+  max-width: 80px;
+  margin-left: 2px;
+}
+
+/* ── streak chip ───────────────────────────────────────── */
+.gh-chip-streak .gh-chip-streak-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gh-streak-current {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.gh-streak-best {
+  font-size: 11px;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  color: var(--primary-color);
+  transition: opacity 0.22s ease, max-width 0.22s ease;
+}
+
+.gh-chip-streak:hover .gh-streak-best {
+  opacity: 0.75;
+  max-width: 80px;
+}
+
+/* ── languages chip ────────────────────────────────────── */
+.gh-chip-langs {
+  gap: 6px;
+}
+
+.gh-langs-inner {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.gh-lang-tag {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--text-color) 25%, transparent);
+  background: color-mix(in srgb, var(--primary-color) 16%, transparent);
+  white-space: nowrap;
+}
