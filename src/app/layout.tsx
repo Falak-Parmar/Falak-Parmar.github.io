@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Falak Parmar",
   description:
     "Data Scientist bridging the gap between some physics, some applied machine learning and some swift development.",
-  metadataBase: new URL("https://sameerasw.com/"), // or whatever baseline they want, let's keep it or make it general
+  metadataBase: new URL("https://falak-parmar.github.io/"),
   keywords:
     "Falak Parmar, Falak-Parmar, Data Science, Quantum Machine Learning, Physics, Portfolio",
   openGraph: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: "Falak Parmar - Personal Space",
     description:
       "Data Scientist bridging the gap between some physics, some applied machine learning and some swift development.",
-    url: "https://sameerasw.com/",
+    url: "https://falak-parmar.github.io/",
     images: [
       {
         url: "/assets/img/web-preview.png",
