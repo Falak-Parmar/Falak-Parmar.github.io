@@ -7,68 +7,56 @@ a, button, select, input, textarea, [role="button"], iframe {
   cursor: none !important;
 }
 
-.cursor-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  pointer-events: none;
-}
-
 .rounded {
   position: fixed;
-  top: -24px;
-  left: -24px;
-  width: 48px;
-  height: 48px;
+  top: -20px;
+  left: -20px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10000;
   pointer-events: none;
-  mix-blend-mode: difference; /* Highly visible on both light and dark backgrounds */
-  transition: opacity 0.2s ease;
+  color: #64dcff; /* Ethereal glowing blue/cyan */
+  filter: drop-shadow(0 0 2px rgba(100, 220, 255, 0.5));
+  transition: opacity 0.2s ease, color 0.3s ease, filter 0.3s ease;
 
   @media screen and (max-width: 500px) {
     display: none !important;
   }
 }
 
-/* Clean, minimal outer ring */
-.cursor-ring {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
+/* Inside element carrying the Aon Rao SVG */
+.cursor-aon {
+  width: 100%;
+  height: 100%;
+  transform: scale(0.7); /* default size is neat and compact */
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Clean, minimal inner core dot */
-.cursor-core {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.9);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
+/* Hover growth and spinning rune animation */
+.cursor-grow .cursor-aon {
+  color: #ffffff; /* Brighten to pure white on hover */
+  filter: drop-shadow(0 0 6px #64dcff);
+  animation: spin-glyph 10s linear infinite;
 }
 
-/* Minimal hover scaling */
-.cursor-grow .cursor-ring {
-  width: 32px;
-  height: 32px;
-  border-color: rgba(255, 255, 255, 0.8);
+/* Tactical responsive click reaction */
+.cursor-click .cursor-aon {
+  transform: scale(0.55) !important;
+  animation: none;
+  transition: transform 0.08s ease-out;
 }
 
-.cursor-grow .cursor-core {
-  width: 6px;
-  height: 6px;
-  background-color: #ffffff;
+@keyframes spin-glyph {
+  from {
+    transform: scale(1.1) rotate(0deg);
+  }
+  to {
+    transform: scale(1.1) rotate(360deg);
+  }
 }
 
 #cursor-text {
