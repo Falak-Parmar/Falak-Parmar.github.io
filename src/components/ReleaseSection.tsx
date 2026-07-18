@@ -66,9 +66,9 @@ export default function ReleaseSection() {
         };
 
         // Query the GitHub Search Commits API to get all latest commits made by Falak-Parmar
-        // across all public repositories in a single API call.
+        // across all public repositories, excluding the portfolio repository (Falak-Parmar.github.io).
         const res = await fetch(
-          "https://api.github.com/search/commits?q=author:Falak-Parmar&sort=committer-date&order=desc&per_page=8",
+          "https://api.github.com/search/commits?q=author:Falak-Parmar+-repo:Falak-Parmar/Falak-Parmar.github.io&sort=committer-date&order=desc&per_page=8",
           { headers }
         );
 
