@@ -59,16 +59,13 @@ export default function ReleaseSection() {
   useEffect(() => {
     async function fetchCommits() {
       let fetchedCommits: Commit[] = [];
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      const oneWeekAgoMs = oneWeekAgo.getTime();
 
       try {
         const headers: Record<string, string> = {
           Accept: "application/vnd.github+json",
         };
 
-        // Fetch public events first
+        // 1. Fetch public events first (gets active pushes across all public repos)
         const res = await fetch("https://api.github.com/users/Falak-Parmar/events", {
           headers,
         });
@@ -79,7 +76,7 @@ export default function ReleaseSection() {
             for (const event of data) {
               const eventTime = new Date(event.created_at).getTime();
               
-              if (eventTime >= oneWeekAgoMs && event.type === "PushEvent" && event.payload?.commits) {
+              if (event.type === "PushEvent" && event.payload?.commits) {
                 for (const c of event.payload.commits) {
                   fetchedCommits.push({
                     id: c.sha.slice(0, 7),
@@ -99,7 +96,7 @@ export default function ReleaseSection() {
           }
         }
 
-        // Also fetch repository commits directly for LoFa-De_CTG (active repo)
+        // 2. Fetch repository commits directly for your main active repo (LoFa-De_CTG)
         const repoCommitsRes = await fetch("https://api.github.com/repos/Falak-Parmar/LoFa-De_CTG/commits", {
           headers,
         });
@@ -109,21 +106,20 @@ export default function ReleaseSection() {
           if (Array.isArray(repoCommits)) {
             for (const c of repoCommits) {
               const commitTime = new Date(c.commit.committer.date).getTime();
-              if (commitTime >= oneWeekAgoMs) {
-                if (!fetchedCommits.some((existing) => existing.id === c.sha.slice(0, 7))) {
-                  fetchedCommits.push({
-                    id: c.sha.slice(0, 7),
-                    repo: "LoFa-De_CTG",
-                    message: c.commit.message,
-                    date: new Date(c.commit.committer.date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    }),
-                    timestamp: commitTime,
-                    url: `https://github.com/Falak-Parmar/LoFa-De_CTG/commit/${c.sha}`,
-                  });
-                }
+              // Avoid duplicates if we already caught it in events
+              if (!fetchedCommits.some((existing) => existing.id === c.sha.slice(0, 7))) {
+                fetchedCommits.push({
+                  id: c.sha.slice(0, 7),
+                  repo: "LoFa-De_CTG",
+                  message: c.commit.message,
+                  date: new Date(c.commit.committer.date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  }),
+                  timestamp: commitTime,
+                  url: `https://github.com/Falak-Parmar/LoFa-De_CTG/commit/${c.sha}`,
+                });
               }
             }
           }
@@ -132,12 +128,15 @@ export default function ReleaseSection() {
         console.error("Failed to fetch GitHub commits, using fallback", err);
       }
 
-      // If no live commits from the past week, use fallback commits
+      // If network calls failed or returned nothing at all, use fallback mock commits
       if (fetchedCommits.length === 0) {
         fetchedCommits = getFallbackCommits();
       }
 
+      // Sort commits chronologically (newest first)
       fetchedCommits.sort((a, b) => b.timestamp - a.timestamp);
+      
+      // Slice to top 8 most recent actual commits
       setCommits(fetchedCommits.slice(0, 8));
       setLoading(false);
     }
