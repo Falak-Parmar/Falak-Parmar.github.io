@@ -633,11 +633,25 @@ export default function HomeClient({
                     src="https://skillicons.dev/icons?i=git&theme=light"
                     alt="My skills"
                   />
-                  <img
-                    className=" skill-icons"
-                    src="https://skillicons.dev/icons?i=cpp&theme=light"
-                    alt="My skills"
-                  />
+                  <span
+                    className="skill-icons-emoji"
+                    title="Agentic Coding"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "28px",
+                      height: "28px",
+                      fontSize: "1.05rem",
+                      background: "rgba(255, 255, 255, 0.06)",
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      userSelect: "none"
+                    }}
+                  >
+                    👾
+                  </span>
                 </a>
               </div>
             </div>

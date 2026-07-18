@@ -506,3 +506,13 @@ section:not(#intro, #apps) {
 .wallpaper-card-credits a:hover {
   text-decoration: underline;
 }
+
+#contact {
+  padding-bottom: 4em;
+}
+
+@media screen and (max-width: 750px) {
+  #contact {
+    padding-bottom: 8em; /* Spacing to prevent mobile floating nav bar overlap */
+  }
+}
