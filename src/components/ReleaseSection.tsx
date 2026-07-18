@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import "@/styles/index/release-feed.css";
 
 interface Commit {
@@ -11,7 +13,6 @@ interface Commit {
 }
 
 const getFallbackCommits = (): Commit[] => {
-  // Current local time is 2026-07-12
   const baseTime = new Date("2026-07-12T12:00:00Z").getTime();
   const dayMs = 24 * 60 * 60 * 1000;
 
@@ -51,98 +52,122 @@ const getFallbackCommits = (): Commit[] => {
   ];
 };
 
-export default async function ReleaseSection() {
-  let commits: Commit[] = [];
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const oneWeekAgoMs = oneWeekAgo.getTime();
+export default function ReleaseSection() {
+  const [commits, setCommits] = useState<Commit[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  try {
-    const headers: Record<string, string> = {
-      Accept: "application/vnd.github+json",
-      "User-Agent": "Falak-Parmar-Portfolio",
-    };
-    if (process.env.GITHUB_TOKEN) {
-      headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
-    }
+  useEffect(() => {
+    async function fetchCommits() {
+      let fetchedCommits: Commit[] = [];
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const oneWeekAgoMs = oneWeekAgo.getTime();
 
-    // Fetch public events first
-    const res = await fetch("https://api.github.com/users/Falak-Parmar/events", {
-      headers,
-      next: { revalidate: 60 },
-    });
+      try {
+        const headers: Record<string, string> = {
+          Accept: "application/vnd.github+json",
+        };
 
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        for (const event of data) {
-          const eventTime = new Date(event.created_at).getTime();
-          
-          if (eventTime >= oneWeekAgoMs && event.type === "PushEvent" && event.payload?.commits) {
-            for (const c of event.payload.commits) {
-              commits.push({
-                id: c.sha.slice(0, 7),
-                repo: event.repo.name.replace("Falak-Parmar/", ""),
-                message: c.message,
-                date: new Date(event.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                }),
-                timestamp: eventTime,
-                url: `https://github.com/${event.repo.name}/commit/${c.sha}`,
-              });
+        // Fetch public events first
+        const res = await fetch("https://api.github.com/users/Falak-Parmar/events", {
+          headers,
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            for (const event of data) {
+              const eventTime = new Date(event.created_at).getTime();
+              
+              if (eventTime >= oneWeekAgoMs && event.type === "PushEvent" && event.payload?.commits) {
+                for (const c of event.payload.commits) {
+                  fetchedCommits.push({
+                    id: c.sha.slice(0, 7),
+                    repo: event.repo.name.replace("Falak-Parmar/", ""),
+                    message: c.message,
+                    date: new Date(event.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    }),
+                    timestamp: eventTime,
+                    url: `https://github.com/${event.repo.name}/commit/${c.sha}`,
+                  });
+                }
+              }
             }
           }
         }
-      }
-    }
 
-    // Also fetch repository commits directly for LoFa-De_CTG (active repo) to make sure multiple commits show up
-    const repoCommitsRes = await fetch("https://api.github.com/repos/Falak-Parmar/LoFa-De_CTG/commits", {
-      headers,
-      next: { revalidate: 60 },
-    });
+        // Also fetch repository commits directly for LoFa-De_CTG (active repo)
+        const repoCommitsRes = await fetch("https://api.github.com/repos/Falak-Parmar/LoFa-De_CTG/commits", {
+          headers,
+        });
 
-    if (repoCommitsRes.ok) {
-      const repoCommits = await repoCommitsRes.json();
-      if (Array.isArray(repoCommits)) {
-        for (const c of repoCommits) {
-          const commitTime = new Date(c.commit.committer.date).getTime();
-          if (commitTime >= oneWeekAgoMs) {
-            // Avoid duplicates
-            if (!commits.some((existing) => existing.id === c.sha.slice(0, 7))) {
-              commits.push({
-                id: c.sha.slice(0, 7),
-                repo: "LoFa-De_CTG",
-                message: c.commit.message,
-                date: new Date(c.commit.committer.date).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                }),
-                timestamp: commitTime,
-                url: `https://github.com/Falak-Parmar/LoFa-De_CTG/commit/${c.sha}`,
-              });
+        if (repoCommitsRes.ok) {
+          const repoCommits = await repoCommitsRes.json();
+          if (Array.isArray(repoCommits)) {
+            for (const c of repoCommits) {
+              const commitTime = new Date(c.commit.committer.date).getTime();
+              if (commitTime >= oneWeekAgoMs) {
+                if (!fetchedCommits.some((existing) => existing.id === c.sha.slice(0, 7))) {
+                  fetchedCommits.push({
+                    id: c.sha.slice(0, 7),
+                    repo: "LoFa-De_CTG",
+                    message: c.commit.message,
+                    date: new Date(c.commit.committer.date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    }),
+                    timestamp: commitTime,
+                    url: `https://github.com/Falak-Parmar/LoFa-De_CTG/commit/${c.sha}`,
+                  });
+                }
+              }
             }
           }
         }
+      } catch (err) {
+        console.error("Failed to fetch GitHub commits, using fallback", err);
       }
+
+      // If no live commits from the past week, use fallback commits
+      if (fetchedCommits.length === 0) {
+        fetchedCommits = getFallbackCommits();
+      }
+
+      fetchedCommits.sort((a, b) => b.timestamp - a.timestamp);
+      setCommits(fetchedCommits.slice(0, 8));
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Failed to fetch GitHub commits, using fallback", err);
+
+    fetchCommits();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="release-feed-wrapper">
+        <div className="release-feed-scroll no-scrollbar" style={{ display: "flex", gap: "1rem", overflowX: "auto", paddingBottom: "1.5rem" }}>
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="release-card skeleton"
+              style={{
+                minWidth: "260px",
+                maxWidth: "260px",
+                height: "135px",
+                background: "rgba(255, 255, 255, 0.05)",
+                borderRadius: "16px",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                opacity: 0.3
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
   }
-
-  // Fall back to recent LoFa-De_CTG commits if no live commits are found from past week
-  if (commits.length === 0) {
-    commits = getFallbackCommits();
-  }
-
-  // Sort commits chronologically (newest first)
-  commits.sort((a, b) => b.timestamp - a.timestamp);
-
-  // Slice to top 8 commits
-  commits = commits.slice(0, 8);
 
   return (
     <div className="release-feed-wrapper page-loaded">
@@ -165,7 +190,7 @@ export default async function ReleaseSection() {
                   {commit.message}
                 </h3>
               </div>
-              <div style={{ marginTop: "1rem", display: "flex", justifyContent: "between", alignItems: "center", width: "100%" }}>
+              <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                 <span className="release-card-date" style={{ fontSize: "0.75rem", opacity: 0.6 }}>{commit.date}</span>
                 <span style={{ fontSize: "0.7rem", fontFamily: "monospace", opacity: 0.5, marginLeft: "auto", background: "var(--background-color-secondary)", padding: "2px 6px", borderRadius: "4px" }}>
                   {commit.id}
