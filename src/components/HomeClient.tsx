@@ -387,20 +387,71 @@ export default function HomeClient({
           </div>
           <div className="container">
             <div id="highlights">
+              {/* 1. Drift */}
               <a
-                id="airsync"
+                id="drift"
                 className="highlight-item item"
-                href="https://github.com/Falak-Parmar/LoFa-De_CTG.git"
+                href="https://github.com/Falak-Parmar/Drift"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="highlight-content">
+                  <h3>Drift</h3>
+                  <p className="highlight-description">
+                    Cross-platform Universal Control pipeline between macOS (AirDrift) and Android (DroidDrift) allowing mouse and keyboard sharing.
+                  </p>
+                </div>
+              </a>
+
+              {/* 2. AirSync Android */}
+              <a
+                id="airsync-android"
+                className="highlight-item item"
+                href="https://github.com/Falak-Parmar/airsync-android/tree/feature/airsync-active-toggle"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="highlight-content">
+                  <h3>
+                    AirSync Android
+                    <span style={{
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      color: "var(--text-color)",
+                      padding: "2px 8px",
+                      borderRadius: "12px",
+                      fontSize: "0.7rem",
+                      fontWeight: 500,
+                      marginLeft: "10px",
+                      display: "inline-block",
+                      verticalAlign: "middle"
+                    }}>
+                      feature/active-toggle
+                    </span>
+                  </h3>
+                  <p className="highlight-description">
+                    Kotlin Jetpack Compose client for AirSync. Features custom notification listeners, QR authentication, and a background active-toggle system.
+                  </p>
+                </div>
+              </a>
+
+              {/* 3. Logical Fallacy Detection & CTG */}
+              <a
+                id="logical-fallacy"
+                className="highlight-item item"
+                href="https://github.com/Falak-Parmar/LoFa-De_CTG"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <div className="highlight-content">
                   <h3>Logical Fallacy Detection & CTG</h3>
                   <p className="highlight-description">
-                    Exploring whether neural networks can detect logical fallacies and generate text that maintains logical consistency.
+                    Fine-tuned RoBERTa models and data pipelines for fallacy classification, achieving 80.65% Test F1 using inverse-frequency weighting & threshold calibration.
                   </p>
                 </div>
               </a>
+
+              {/* 4. HEP Event Classification via VQC */}
               <a
                 id="essentials"
                 className="highlight-item item"
@@ -411,10 +462,12 @@ export default function HomeClient({
                 <div className="highlight-content">
                   <h3>HEP Event Classification via VQC</h3>
                   <p className="highlight-description">
-                    A hybrid quantum-classical machine learning algorithm for event classification in high-energy physics.
+                    A hybrid quantum-classical machine learning algorithm for event classification in high-energy physics using Variational Quantum Circuits.
                   </p>
                 </div>
               </a>
+
+              {/* 5. Book-Finder */}
               <a
                 id="zen-t"
                 className="highlight-item item"
@@ -429,17 +482,89 @@ export default function HomeClient({
                   </p>
                 </div>
               </a>
+
+              {/* 6. Contributions Header */}
+              <div style={{ marginTop: "2.5rem", marginBottom: "0.5rem" }} className="heading item">
+                <h2 style={{ fontSize: "1.45rem", opacity: 0.85 }}>Contributions</h2>
+              </div>
+
+              {/* Contribution 1: SpotiFLAC */}
+              <a
+                id="spotiflac"
+                className="highlight-item item"
+                href="https://github.com/BartolomeoRusso9/SpotiFLAC-Module-Version/pull/132"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="highlight-content">
+                  <h3>
+                    SpotiFLAC-Module-Version
+                    <span style={{
+                      background: "rgba(100, 220, 255, 0.12)",
+                      border: "1px solid rgba(100, 220, 255, 0.25)",
+                      color: "#64dcff",
+                      padding: "2px 8px",
+                      borderRadius: "12px",
+                      fontSize: "0.7rem",
+                      fontWeight: 500,
+                      marginLeft: "10px",
+                      display: "inline-block",
+                      verticalAlign: "middle"
+                    }}>
+                      Contributor
+                    </span>
+                  </h3>
+                  <p className="highlight-description">
+                    Contributed to SpotiFLAC: resolved API resolver validations and implemented robust token auto-renewal mechanics.
+                  </p>
+                </div>
+              </a>
+
+              {/* Contribution 2: ml-assisted-re-distribution */}
+              <a
+                id="ml-redistribution"
+                className="highlight-item item"
+                href="https://github.com/AdityaJana011/ml-assisted-re-distribution"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="highlight-content">
+                  <h3>
+                    ml-assisted-re-distribution
+                    <span style={{
+                      background: "rgba(100, 220, 255, 0.12)",
+                      border: "1px solid rgba(100, 220, 255, 0.25)",
+                      color: "#64dcff",
+                      padding: "2px 8px",
+                      borderRadius: "12px",
+                      fontSize: "0.7rem",
+                      fontWeight: 500,
+                      marginLeft: "10px",
+                      display: "inline-block",
+                      verticalAlign: "middle"
+                    }}>
+                      Contributor
+                    </span>
+                  </h3>
+                  <p className="highlight-description">
+                    Co-authored the machine learning pipelines and statistical models for assisting optimal resource re-distribution.
+                  </p>
+                </div>
+              </a>
+
+              {/* 7. More on GitHub */}
               <a
                 id="more-github"
                 className="highlight-item item"
                 href="https://github.com/Falak-Parmar"
                 target="_blank"
                 rel="noopener noreferrer"
+                style={{ marginTop: "1.5rem" }}
               >
                 <div className="highlight-content">
                   <h3>More on GitHub</h3>
                   <p className="highlight-description">
-                    Explore all my other data pipelines and quantum computing setups.
+                    Explore all my other data pipelines, quantum computing setups, and open-source contributions.
                   </p>
                 </div>
               </a>
