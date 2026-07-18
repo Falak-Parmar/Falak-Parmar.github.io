@@ -65,78 +65,45 @@ export default function ReleaseSection() {
           Accept: "application/vnd.github+json",
         };
 
-        // 1. Fetch public events first (gets active pushes across all public repos)
-        const res = await fetch("https://api.github.com/users/Falak-Parmar/events", {
-          headers,
-        });
+        // Query the GitHub Search Commits API to get all latest commits made by Falak-Parmar
+        // across all public repositories in a single API call.
+        const res = await fetch(
+          "https://api.github.com/search/commits?q=author:Falak-Parmar&sort=committer-date&order=desc&per_page=8",
+          { headers }
+        );
 
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data)) {
-            for (const event of data) {
-              const eventTime = new Date(event.created_at).getTime();
-              
-              if (event.type === "PushEvent" && event.payload?.commits) {
-                for (const c of event.payload.commits) {
-                  fetchedCommits.push({
-                    id: c.sha.slice(0, 7),
-                    repo: event.repo.name.replace("Falak-Parmar/", ""),
-                    message: c.message,
-                    date: new Date(event.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    }),
-                    timestamp: eventTime,
-                    url: `https://github.com/${event.repo.name}/commit/${c.sha}`,
-                  });
-                }
-              }
-            }
-          }
-        }
-
-        // 2. Fetch repository commits directly for your main active repo (LoFa-De_CTG)
-        const repoCommitsRes = await fetch("https://api.github.com/repos/Falak-Parmar/LoFa-De_CTG/commits", {
-          headers,
-        });
-
-        if (repoCommitsRes.ok) {
-          const repoCommits = await repoCommitsRes.json();
-          if (Array.isArray(repoCommits)) {
-            for (const c of repoCommits) {
-              const commitTime = new Date(c.commit.committer.date).getTime();
-              // Avoid duplicates if we already caught it in events
-              if (!fetchedCommits.some((existing) => existing.id === c.sha.slice(0, 7))) {
-                fetchedCommits.push({
-                  id: c.sha.slice(0, 7),
-                  repo: "LoFa-De_CTG",
-                  message: c.commit.message,
-                  date: new Date(c.commit.committer.date).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  }),
-                  timestamp: commitTime,
-                  url: `https://github.com/Falak-Parmar/LoFa-De_CTG/commit/${c.sha}`,
-                });
-              }
+          if (data && Array.isArray(data.items)) {
+            for (const item of data.items) {
+              fetchedCommits.push({
+                id: item.sha.slice(0, 7),
+                repo: item.repository.name,
+                // Only display the first line of multi-line commit messages
+                message: item.commit.message.split("\n")[0],
+                date: new Date(item.commit.committer.date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                }),
+                timestamp: new Date(item.commit.committer.date).getTime(),
+                url: item.html_url,
+              });
             }
           }
         }
       } catch (err) {
-        console.error("Failed to fetch GitHub commits, using fallback", err);
+        console.error("Failed to fetch GitHub commits search, using fallback", err);
       }
 
       // If network calls failed or returned nothing at all, use fallback mock commits
       if (fetchedCommits.length === 0) {
         fetchedCommits = getFallbackCommits();
+      } else {
+        // Sort commits chronologically (newest first)
+        fetchedCommits.sort((a, b) => b.timestamp - a.timestamp);
       }
-
-      // Sort commits chronologically (newest first)
-      fetchedCommits.sort((a, b) => b.timestamp - a.timestamp);
       
-      // Slice to top 8 most recent actual commits
       setCommits(fetchedCommits.slice(0, 8));
       setLoading(false);
     }
